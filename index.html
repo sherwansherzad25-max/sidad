@@ -621,12 +621,21 @@
         <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
         <div class="backup-card" style="border-color: var(--primary);">
             <div class="backup-icon">🔑</div>
-            <h3 style="margin-top: 0; color: var(--primary);">گۆڕینی پاسۆردی سیستەم</h3>
-            <p style="font-size: 13px; color: var(--text-color); opacity:0.8;">پاسۆردی بنەڕەتی <b>0000</b>ـە.</p>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <input type="password" id="oldPin" placeholder="پاسۆردی کۆن" style="border:1px solid var(--border-color);">
-                <input type="password" id="newPin" placeholder="پاسۆردی نوێ" style="border:1px solid var(--border-color);">
-                <button class="btn btn-primary" style="background-image:var(--grad-primary);" onclick="changeSystemPin()">گۆڕینی پاسۆرد</button>
+            <h3 style="margin-top: 0; color: var(--primary);">گۆڕینی پاسۆردی سیستەم (کڵاود)</h3>
+            <p style="font-size: 13px; color: var(--text-color); opacity:0.8;">پاسۆردی بنەڕەتی <b>0000</b>ـە. لێرەوە پاسۆردی خۆت و کاشێرەکە بگۆڕە و ڕاستەوخۆ لە هەموو ئامێرەکان دەگۆڕێت.</p>
+            
+            <div style="display:flex; flex-direction:column; gap:15px; margin-top: 15px;">
+                <div style="text-align: right;">
+                    <label style="font-weight: bold; font-size: 13px;">پاسۆردی نوێی خاوەنکار (سیداد):</label>
+                    <input type="text" id="newAdminPinSettings" placeholder="بۆ نموونە: 1234" style="width:100%; border:1px solid var(--border-color); padding:8px; border-radius:5px; margin-top:5px; text-align:left;" dir="ltr">
+                </div>
+
+                <div style="text-align: right;">
+                    <label style="font-weight: bold; font-size: 13px;">پاسۆردی نوێی کاشێر:</label>
+                    <input type="text" id="newCashierPinSettings" placeholder="بۆ نموونە: 0000" style="width:100%; border:1px solid var(--border-color); padding:8px; border-radius:5px; margin-top:5px; text-align:left;" dir="ltr">
+                </div>
+
+                <button class="btn btn-primary" style="background-image:var(--grad-primary);" onclick="changeSystemPasswords()">پاشەکەوتکردنی پاسۆردەکان لە کڵاود</button>
             </div>
         </div>
         <div class="backup-card">
