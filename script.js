@@ -1553,13 +1553,31 @@ function submitQuickDebt(name) {
     saveDebts(debts); openDebtModal(name); 
     if(currentQuickAction === 'pay' && currentTotal > 0) { setTimeout(() => { pendingExtendDateName = name; document.getElementById('extendDateText').innerText = `هێشتا بڕی ${currentTotal.toLocaleString()} ${cur === 'IQD' ? 'دینار' : 'دۆلار'} ماوە. ئایا دەتەوێت کاتەکەی بۆ درێژ بکەیتەوە؟`; document.getElementById('newExtendedDate').value = debts[name].dueDate || ''; document.getElementById('extendDateModal').style.display = 'flex'; }, 100); }
 }
-
 // --- پاشەکەوتکردن و هێنانەوەی داتا (Backup & Restore) ---
 function exportData() {
-    const data = { receiptsCompare: localStorage.getItem('khalkhalanFull') || "[]", salesData: localStorage.getItem('khalkhalanSalesData') || "[]", debts: localStorage.getItem('khalkhalanDebts') || "{}", companyDebts: localStorage.getItem('khalkhalanCompanyDebts') || "{}", inventory: localStorage.getItem('khalkhalanInventory') || "{}", expenses: localStorage.getItem('khalkhalanExpenses') || "[]", adminPin: localStorage.getItem('khalkhalanAdminPin') || "0000" };
-    const blob = new Blob([JSON.stringify(data)], { type: "application/json" }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `Khalkhalan_Backup_${new Date().toISOString().split('T')[0]}.json`; link.click(); URL.revokeObjectURL(url);
+    // دەبێت گۆڕاوی data لێرەدا هەبێت (وەک خۆی لێی گەڕێ ئەگەر پێشتر هەبووە)
+    const blob = new Blob([JSON.stringify(data)], { type: "application/json" }); 
+    const url = URL.createObjectURL(blob); 
+    const link = document.createElement('a'); 
+    link.href = url; 
+    link.download = `Khalkhalan_Backup_${new Date().toISOString().split('T')[0]}.json`; 
+    link.click(); 
+    URL.revokeObjectURL(url);
 }
 
+// --- بەشی چوونە ژوورەوەی خاوەنکار ---
+function verifyPin() {
+    const input = document.getElementById('adminPinInput').value;
+    let savedPin = localStorage.getItem('khalkhalanAdminPin') || '0000';
+    
+    // ئەم دێڕە زیادکراوە بۆ چارەسەرکردنی کێشەی هێماکان کاتێک لە کڵاودەوە دێت
+    savedPin = savedPin.replace(/"/g, ''); 
+
+    // لێرەوە باقی کۆدەکەی خۆت وەک خۆی دەمێنێتەوە...
+    if (input === savedPin) {
+        // ... کۆدی چوونە ژوورەوە ...
+    }
+}
 function importData(event) {
     const file = event.target.files[0]; if(!file) return;
     if(confirm("ئاگاداربە! داتای ئێستات دەسڕێتەوە و هی ناو فایلەکە دادەنێت. دڵنیای؟")) {
@@ -2258,7 +2276,8 @@ db.enablePersistence().catch(function(err) {
 const syncKeys = [
     'khalkhalanInventory', 'khalkhalanSalesData', 'khalkhalanExpenses',
     'khalkhalanDebts', 'khalkhalanCompanyDebts', 'khalkhalanUsers', 
-    'khalkhalanShifts', 'khalkhalanFull'
+    'khalkhalanShifts', 'khalkhalanFull', 
+    'khalkhalanAdminPin', 'khalkhalanCashierPin'
 ];
 
 // ٥. ناردنی ئۆتۆماتیکی داتا بۆ فایەربەیس (بەبێ تێکدانی خێرایی سیستەمەکە)
@@ -2301,4 +2320,24 @@ function refreshUI() {
     if(typeof renderDebtorsList === 'function') renderDebtorsList();
     if(typeof CSH !== 'undefined' && CSH.render) CSH.render();
     if(typeof checkLowStock === 'function') checkLowStock();
+}
+// فەنکشنی تایبەت بە گۆڕینی پاسۆردەکان لەلایەن خاوەنکارەوە
+function changeSystemPasswords() {
+    const newAdmin = document.getElementById('newAdminPinSettings').value;
+    const newCashier = document.getElementById('newCashierPinSettings').value;
+
+    if (newAdmin !== "") {
+        // خەزنکردن کە ڕاستەوخۆ دەچێتە فایەربەیس
+        localStorage.setItem('khalkhalanAdminPin', JSON.stringify(newAdmin));
+        alert("پاسۆردی خاوەنکار بە سەرکەوتوویی گۆڕدرا!");
+    }
+    
+    if (newCashier !== "") {
+        localStorage.setItem('khalkhalanCashierPin', JSON.stringify(newCashier));
+        alert("پاسۆردی کاشێر بە سەرکەوتوویی گۆڕدرا!");
+    }
+
+    // پاککردنەوەی بۆکسەکان دوای سەیڤکردن
+    if(document.getElementById('newAdminPinSettings')) document.getElementById('newAdminPinSettings').value = "";
+    if(document.getElementById('newCashierPinSettings')) document.getElementById('newCashierPinSettings').value = "";
 }
