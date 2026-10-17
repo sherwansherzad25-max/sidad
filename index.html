@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>جیهانی جگه‌ره‌ و ڤه‌یپی سیداد</title>
+    <meta name="apple-mobile-web-app-title" content="SidadVape">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <script src="html2canvas.min.js"></script>
+    <script src="html5-qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800;900&family=Noto+Sans+Arabic:wght@400;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="locked">
+
+<div class="container" id="mainContainer">
+    <div class="header-wrapper">
+        <div class="header-controls-left">
+            <button onclick="toggleTheme()" class="btn" style="background:var(--input-bg); color:var(--text-color); border:1px solid var(--border-color); padding: 8px 12px; font-size: 12px;">🌓 مۆد</button>
+            <button onclick="toggleFullScreen()" class="btn-add" style="padding: 8px 12px; font-size: 12px;">🖥️ شاشە</button>
+        </div>
+        <div class="main-header">
+            <h1>جیهانی جگه‌ره‌ و ڤه‌یپی سیداد</h1>
+            <p class="owner-name">خاوەنی:سیداد</p>
+            <div class="live-clock-bar">
+                <span id="liveClockDisplay" id="headerClock">--:--:--</span>
+                <span id="todaySalesBadge" style="background:var(--success); color:white; padding:4px 10px; border-radius:15px; font-size:11px;">🛒 <span id="todaySalesCount">0</span> وەسڵی ئەمڕۆ</span>
+            </div>
+        </div>
+        <div class="header-controls">
+            <button onclick="closeMarketReport()" class="btn" style="background-image:var(--grad-warning); color: #fff !important; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); padding: 8px 15px; font-size: 13px; border-radius:20px; box-shadow:0 4px 10px rgba(243,156,18,0.3);">📅 داخستنی بازاڕ</button>
+            
+            <button onclick="openLowStockModal()" class="btn" style="background:var(--input-bg); color:var(--text-color); border:1px solid var(--border-color); padding: 8px 12px; font-size: 13px; border-radius:20px; position:relative;">
+                🔔 زەنگ <span id="lowStockBadge" style="position:absolute; top:-8px; right:-8px; background:var(--danger); color:white; border-radius:50%; padding:3px 6px; font-size:11px; display:none;">0</span>
+            </button>
+            <button id="lockToggleBtn" onclick="openLockModal()" class="btn" style="background-image:var(--grad-danger); padding: 8px 15px; font-size: 13px; border-radius:20px;">🔒 کاشێر</button>
+        </div>
+    </div>
+
+    <div id="mainDashboard" class="dashboard-grid">
+        <div class="menu-card card-sales" onclick="switchTab('tab-sales')">
+            <div class="icon">🛒</div>
+            <h3>فرۆشتن</h3>
+            <div class="desc">بڕینی وەسڵی نوێ بۆ کڕیار</div>
+        </div>
+        <div class="menu-card card-compare" onclick="switchTab('tab-compare')">
+            <div class="icon">🧾</div>
+            <h3>بەراوردی وەسڵ</h3>
+            <div class="desc">حیسابکردنی وەسڵی کۆمپانیاکان</div>
+        </div>
+        <div class="menu-card card-add-inv" onclick="switchTab('tab-add-inventory')">
+            <div class="icon">📥</div>
+            <h3>هاتووی کۆگا</h3>
+            <div class="desc">زیادکردنی بڕی کاڵا بۆ مەخزەن</div>
+        </div>
+        
+        <div class="menu-card card-inv admin-only-card" onclick="switchTab('tab-inventory')">
+            <div class="admin-badge">🔐 بەڕێوەبەر</div>
+            <div class="icon">📦</div>
+            <h3>بەڕێوەبردنی کۆگا</h3>
+            <div class="desc">ناساندنی کاڵا و گۆڕینی نرخ</div>
+        </div>
+        <div class="menu-card card-offers admin-only-card" onclick="switchTab('tab-offers')">
+            <div class="admin-badge">🔐 بەڕێوەبەر</div>
+            <div class="icon">🏷️</div>
+            <h3>ئۆفەرەکان</h3>
+            <div class="desc">ڕێکخستنی داشکاندنەکان</div>
+        </div>
+        <div class="menu-card card-stats admin-only-card" onclick="switchTab('tab-stats')">
+            <div class="admin-badge">🔐 بەڕێوەبەر</div>
+            <div class="icon">📊</div>
+            <h3>ئامار و قازانج</h3>
+            <div class="desc">شیکاری داهات و فرۆش</div>
+        </div>
+
+        <div class="menu-card card-expenses admin-only-card" onclick="switchTab('tab-expenses')">
+            <div class="admin-badge">🔐 بەڕێوەبەر</div>
+            <div class="icon">💸</div>
+            <h3>خەرجییەکان</h3>
+            <div class="desc">تۆمارکردنی خەرجی ڕۆژانە</div>
+        </div>
+        <div class="menu-card card-debts admin-only-card" onclick="switchTab('tab-debts')">
+            <div class="admin-badge">🔐 بەڕێوەبەر</div>
+            <div class="icon">📒</div>
+            <h3>قەرزەکان</h3>
+            <div class="desc">قەرزی کڕیار و کۆمپانیاکان</div>
+        </div>
+        <div class="menu-card card-backup admin-only-card" onclick="switchTab('tab-backup')">
+            <div class="admin-badge">🔐 بەڕێوەبەر</div>
+            <div class="icon">⚙️</div>
+            <h3>ڕێکخستن</h3>
+            <div class="desc">پاسۆرد و پاراستنی داتا</div>
+        </div>
+    </div>
+
+    <div id="tab-sales" class="tab-content">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <button id="returnToggleBtn" class="btn btn-return-toggle" onclick="toggleReturnMode()">🔄 دۆخی گەڕاندنەوە (ناچالاک)</button>
+        
+        <div class="table-responsive">
+            <table id="invoiceTableSales" style="table-layout: auto;">
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">#</th>
+                        <th style="width: 20%;">کۆد</th>
+                        <th style="width: 25%;">ناوی کاڵا</th>
+                        <th style="width: 15%;">بڕ</th>
+                        <th style="width: 15%;">نرخ</th>
+                        <th style="width: 12%;">کۆ</th>
+                        <th style="width: 7%;">🗑️</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBodySales">
+                    <tr data-buy-price="0">
+                        <td class="row-num-cell">١</td>
+                        <td>
+                            <div class="input-with-btn" style="position:relative;">
+                                <input type="text" class="item-code-input" placeholder="کۆد..." oninput="searchInventory(this, 'sales')" onkeydown="handleItemInputKey(event, this)" onchange="handleItemChange(this)" autocomplete="off" style="border-color: var(--accent); font-weight:bold;">
+                                <button class="btn-camera" onclick="openScanner(this)" style="padding: 0 8px;">📷</button>
+                                <div class="item-autocomplete-list"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="item-name-input" readonly placeholder="..." style="background: var(--input-bg); font-weight: bold; color: var(--success); text-align: center; border: 1px dashed var(--border-color); pointer-events: none;">
+                        </td>
+                        <td><input type="text" class="qty format-num" placeholder="١" inputmode="decimal" oninput="calculateAllSales()"></td>
+                        <td><input type="text" class="price format-num" placeholder="نرخ" inputmode="decimal" oninput="calculateAllSales()"></td>
+                        <td><input type="text" class="row-total" placeholder="٠" readonly></td>
+                        <td><button class="btn-delete-row" onclick="deleteSpecificRowSales(this)">🗑️</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <input type="text" id="receiptNoteSales" class="note-input" placeholder="تێبینی بنووسە لێرە (ئارەزوومەندانە)...">
+
+        <div class="discount-container" id="discountContainerSales">
+            <span style="font-weight:bold; color:var(--warning);">خاترگرتن:</span>
+            <input type="text" id="discountValueSales" class="format-num" placeholder="بڕ (دینار)" inputmode="decimal" oninput="calculateAllSales()">
+        </div>
+
+        <div class="action-btns">
+            <div class="top-btns">
+                <button class="btn btn-add" onclick="addRowSales()">+ زیادکردن</button>
+                <button class="btn btn-clear" onclick="clearAllSales()">پاککردنەوە</button>
+            </div>
+            <button id="mainSaleBtn" class="btn btn-sale" onclick="processSale()">🛒 فرۆشتن و تۆمارکردن (پرێنت)</button>
+        </div>
+
+        <div class="total-section">
+            کۆی گشتی: <span id="grandTotalSales">0</span> <span id="mainCurrencySymbolSales">دینار</span>
+            <div class="total-converted">
+                بەرامبەرە بە: <span id="convertedTotalSales">0</span> <span id="convertedCurrencySymbolSales">دۆلار</span>
+            </div>
+        </div>
+
+        <div class="bottom-panel">
+            <div class="rate-box">
+                ١٠٠ دۆلار: 
+                <input type="text" id="dollarRateSales" class="format-num" value="150,000" inputmode="decimal" oninput="calculateAllSales(); convertUsdToIqdSales(); convertIqdToUsdSales();"> دینار
+            </div>
+            <div class="converter-grid">
+                <div class="convert-box">
+                    دۆلار ⬅️ دینار<br>
+                    <input type="text" id="calcUSDSales" class="format-num" placeholder="$" inputmode="decimal" oninput="convertUsdToIqdSales()">
+                    <span id="resIQDSales">0 دینار</span>
+                </div>
+                <div class="convert-box">
+                    دینار ⬅️ دۆلار<br>
+                    <input type="text" id="calcIQDSales" class="format-num" placeholder="دینار" inputmode="decimal" oninput="convertIqdToUsdSales()">
+                    <span id="resUSDSales">0 دۆلار</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3 style="color: var(--primary); text-align: center; margin: 0 0 15px 0;">🧾 وەسڵەکانی ئەمڕۆ (٦ بەیانی تا ئێستا)</h3>
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="flex: 1; border: 1px solid var(--success); border-radius: 8px; background: var(--container-bg); overflow: hidden;">
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 8px; text-align: center; font-weight: bold; color: var(--success); border-bottom: 1px solid var(--success);">🛒 فرۆشتن</div>
+                    <table style="width: 100%; font-size: 13px; text-align: center; border-collapse: collapse;">
+                        <thead><tr style="border-bottom: 1px dashed var(--border-color);"><th>#</th><th>کات</th><th>بڕ</th></tr></thead>
+                        <tbody id="dailySalesList"></tbody>
+                    </table>
+                </div>
+                <div style="flex: 1; border: 1px solid var(--danger); border-radius: 8px; background: var(--container-bg); overflow: hidden;">
+                    <div style="background: rgba(231, 76, 60, 0.1); padding: 8px; text-align: center; font-weight: bold; color: var(--danger); border-bottom: 1px solid var(--danger);">🔄 گەڕاوە</div>
+                    <table style="width: 100%; font-size: 13px; text-align: center; border-collapse: collapse;">
+                        <thead><tr style="border-bottom: 1px dashed var(--border-color);"><th>#</th><th>کات</th><th>بڕ</th></tr></thead>
+                        <tbody id="dailyReturnsList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-compare" class="tab-content">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <div class="currency-selector">
+            پارەی وەسڵەکە: 
+            <label><input type="radio" name="currencyMode" value="IQD" checked onchange="calculateAllCompare()"> دینار</label>
+            <label><input type="radio" name="currencyMode" value="USD" onchange="calculateAllCompare()"> دۆلار</label>
+        </div>
+
+        <div class="table-responsive">
+            <table id="invoiceTable">
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">#</th>
+                        <th style="width: 40%;">ناوی کاڵا</th>
+                        <th style="width: 15%;">بڕ</th>
+                        <th style="width: 20%;">نرخ</th>
+                        <th style="width: 12%;">کۆ</th>
+                        <th style="width: 7%;">🗑️</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <tr>
+                        <td class="row-num-cell">١</td>
+                        <td>
+                            <input type="text" class="item-name-input" placeholder="ناوی کاڵا..." style="background: var(--input-bg); font-weight: bold; color: var(--primary); text-align: center; border: 1px solid var(--border-color);">
+                        </td>
+                        <td><input type="text" class="qty format-num" placeholder="١" inputmode="decimal" oninput="calculateAllCompare()"></td>
+                        <td><input type="text" class="price format-num" placeholder="نرخ" inputmode="decimal" oninput="calculateAllCompare()" onkeydown="if(event.key==='Enter') addRowCompare()"></td>
+                        <td><input type="text" class="row-total" placeholder="٠" readonly></td>
+                        <td><button class="btn-delete-row" onclick="deleteSpecificRowCompare(this)">🗑️</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <input type="text" id="receiptNote" class="note-input" placeholder="تێبینی بنووسە لێرە (ئارەزوومەندانە)...">
+
+        <div class="action-btns">
+            <div class="top-btns">
+                <button class="btn btn-add" onclick="addRowCompare()">+ زیادکردن</button>
+                <button class="btn btn-remove" onclick="removeEmptyRowsCompare()">- کەمکردنەوە</button>
+                <button class="btn btn-clear" onclick="clearAllCompare()">پاککردنەوە</button>
+            </div>
+            <button class="btn btn-save" onclick="previewCompareReceipt()">💾 پاشەکەوتکردنی وەسڵ</button>
+        </div>
+
+        <div class="total-section">
+            کۆی گشتی: <span id="grandTotal">0</span> <span id="mainCurrencySymbol">دینار</span>
+            <div class="total-converted">
+                بەرامبەرە بە: <span id="convertedTotal">0</span> <span id="convertedCurrencySymbol">دۆلار</span>
+            </div>
+        </div>
+
+        <div class="bottom-panel">
+            <div class="rate-box">
+                ١٠٠ دۆلار: 
+                <input type="text" id="dollarRate" class="format-num" value="150,000" inputmode="decimal" oninput="calculateAllCompare(); convertUsdToIqdCompare(); convertIqdToUsdCompare();"> دینار
+            </div>
+            <div class="converter-grid">
+                <div class="convert-box">
+                    دۆلار ⬅️ دینار<br>
+                    <input type="text" id="calcUSD" class="format-num" placeholder="$" inputmode="decimal" oninput="convertUsdToIqdCompare()">
+                    <span id="resIQD">0 دینار</span>
+                </div>
+                <div class="convert-box">
+                    دینار ⬅️ دۆلار<br>
+                    <input type="text" id="calcIQD" class="format-num" placeholder="دینار" inputmode="decimal" oninput="convertIqdToUsdCompare()">
+                    <span id="resUSD">0 دۆلار</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3>وەسڵە پاشەکەوتکراوەکان (بەراورد)</h3>
+            <ul class="history-list" id="historyList"></ul>
+        </div>
+    </div>
+
+    <div id="tab-add-inventory" class="tab-content">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <div class="debt-form" style="border-top: 3px solid var(--accent);">
+            <h3 style="margin-top:0; text-align:center; color:var(--primary);">📥 هێنانە ناوەوەی کاڵا (زیادکردنی بڕ)</h3>
+            <p style="font-size:12px; color:var(--text-color); text-align:center; opacity:0.8;">دەتوانیت ناو یان کۆدی ئەو کاڵایە بنووسیت کە دەتەوێت عەدەدی بۆ زیاد بکەیت</p>
+            
+            <div class="debt-input-group">
+                <label>کۆد یان ناوی کاڵا:</label>
+                <div class="input-with-btn" style="position:relative;">
+                    <input type="text" id="empInvCode" placeholder="سکان بکە یان ناو بنووسە..." oninput="searchAddInventory(this)" autocomplete="off">
+                    <button class="btn-camera" onclick="openScanner(this, 'empInvCode')">📷</button>
+                    <div id="addInvAutocompleteList" class="item-autocomplete-list"></div>
+                </div>
+            </div>
+            <div class="debt-input-group">
+                <label>ناوی کاڵا (تەنها بۆ خوێندنەوە):</label>
+                <input type="text" id="empInvName" readonly placeholder="ناوی کاڵا خۆکارانە لێرە دەردەکەوێت..." style="background:var(--border-color); cursor:not-allowed; border-color:transparent;">
+            </div>
+            <div class="debt-input-group" style="background:var(--container-bg); padding:10px; border-radius:8px; border:1px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <label style="color:var(--accent);">📦 بڕی هاتوو بۆ مەخزەن (عەدەد):</label>
+                <input type="number" id="empInvQty" placeholder="بۆ نموونە: 50" style="border-color:var(--accent);">
+            </div>
+
+            <button class="btn btn-save" onclick="saveEmpInventoryQty()">💾 خستنە سەر مەخزەن</button>
+        </div>
+    </div>
+
+    <div id="tab-offers" class="tab-content admin-only">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <div class="debt-form" style="border-top: 3px solid var(--warning); border-color: var(--warning);">
+            <h3 style="margin-top:0; text-align:center; color:var(--warning);">🏷️ بەڕێوەبردنی داشکاندن و ئۆفەرەکان</h3>
+            <p style="font-size:12px; color:var(--text-color); text-align:center; opacity:0.8;">لێرە کاڵاکان هەڵبژێرە و بیانخەرە لیستی ئۆفەرەکانەوە</p>
+            
+            <div class="debt-input-group" style="background:rgba(243, 156, 18, 0.1); padding:10px; border-radius:8px; margin-bottom:15px; border:1px dashed var(--warning);">
+                <label style="color:var(--warning); text-align:center; font-size:15px;">١. سەرەتا ڕێژەی داشکاندن بنووسە (٪):</label>
+                <input type="number" id="globalDiscountPercent" placeholder="نموونە: 20" style="border-color:var(--warning); font-size:18px; font-weight:bold; text-align:center; width:50%; margin:0 auto; display:block;">
+            </div>
+
+            <div class="debt-input-group">
+                <label>٢. کاڵاکان سکان بکە یان بە ناو بیانگەڕێ:</label>
+                <div class="input-with-btn" style="position:relative;">
+                    <input type="text" id="offerSearchCode" placeholder="سکان بکە یان ناو بنووسە..." oninput="searchForOffer(this)" autocomplete="off" style="border: 2px solid var(--warning);">
+                    <button class="btn-camera" onclick="openScanner(this, 'offerSearchCode')" style="background-image:var(--grad-warning);">📷</button>
+                    <div id="offerAutocompleteList" class="item-autocomplete-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3 style="color:var(--warning);">🛒 لیستی کاڵا داشکێنراوەکان</h3>
+            <div class="table-responsive">
+                <table class="data-table" id="offersTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">ناوی کاڵا</th>
+                            <th style="width: 20%;">نرخی کۆن</th>
+                            <th style="width: 15%;">ڕێژە ٪</th>
+                            <th style="width: 20%;">نرخی نوێ</th>
+                            <th style="width: 10%;">🗑️</th>
+                        </tr>
+                    </thead>
+                    <tbody id="offersTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-inventory" class="tab-content admin-only">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <div class="debt-form" style="border-top: 3px solid var(--primary);">
+            <h3 style="margin-top:0; text-align:center; color:var(--primary);">⚙️ ناساندنی کاڵای نوێ / دەستکاریکردنی نرخ</h3>
+            <p style="font-size:12px; color:var(--text-color); text-align:center; opacity:0.8;">لێرە کاڵای نوێ بناسێنە، یان نرخەکەی بگۆڕە</p>
+            
+            <div class="debt-input-group">
+                <label>کۆد یان بارکۆدی پاکەت:</label>
+                <div class="input-with-btn">
+                    <input type="text" id="invCode" placeholder="بە سکانەر بیخوێنەرەوە..." oninput="autoFillInventory(this.value)">
+                    <button class="btn-camera" onclick="openScanner(this, 'invCode')">📷</button>
+                </div>
+            </div>
+            <div class="debt-input-group">
+                <label>ناوی کاڵا (نموونە: میلانۆ شین):</label>
+                <input type="text" id="invName" placeholder="نموونە: چای مەحمود ٥٠٠گم یان میلانۆ شین">
+            </div>
+            <div class="top-btns">
+                <div class="debt-input-group" style="flex:1;">
+                    <label>نرخی کڕینی پاکەت:</label>
+                    <input type="text" id="invBuy" class="format-num" inputmode="decimal" placeholder="3,500">
+                </div>
+                <div class="debt-input-group" style="flex:1;">
+                    <label>نرخی فرۆشتنی پاکەت:</label>
+                    <input type="text" id="invSell" class="format-num" inputmode="decimal" placeholder="4,000">
+                </div>
+            </div>
+            
+            <!-- زیادکراو بۆ سیستەمی دەستە و کارتۆن -->
+            <div class="top-btns">
+                <div class="debt-input-group" style="flex:1;">
+                    <label>کۆدی دەستە (کارتۆن):</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="invCartonCode" placeholder="سکان بکە...">
+                        <button class="btn-camera" onclick="openScanner(this, 'invCartonCode')">📷</button>
+                    </div>
+                </div>
+                <div class="debt-input-group" style="flex:1;">
+                    <label>عەدەدی پاکەت لە دەستەدا:</label>
+                    <input type="number" id="invPacksPerCarton" value="10" style="width:100%; border:1px solid var(--border-color); padding:10px; border-radius:8px; background:var(--input-bg); color:var(--text-color); text-align:center;">
+                </div>
+            </div>
+            <div class="top-btns">
+                <div class="debt-input-group" style="flex:1;">
+                    <label>نرخی کڕینی دەستە:</label>
+                    <input type="text" id="invCartonBuy" class="format-num" inputmode="decimal" placeholder="35,000">
+                </div>
+                <div class="debt-input-group" style="flex:1;">
+                    <label>نرخی فرۆشتنی دەستە:</label>
+                    <input type="text" id="invCartonSell" class="format-num" inputmode="decimal" placeholder="40,000">
+                </div>
+            </div>
+            <!-- کۆتایی زیادکراو -->
+
+            <div class="debt-input-group" style="background:var(--container-bg); padding:10px; border-radius:8px; border:1px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <label style="color:var(--accent);">📦 دانانی بڕی سەرەتایی پاکەت (ئارەزوومەندانە):</label>
+                <input type="number" id="invQty" placeholder="بۆ نموونە: 50" style="border-color:var(--accent);">
+            </div>
+
+            <button class="btn btn-save" style="background-image: var(--grad-primary);" onclick="saveInventoryItem()">💾 تۆمارکردنی کاڵا / گۆڕینی نرخ</button>
+        </div>
+
+        <div class="history-section">
+            <h3 style="color:var(--primary);">📦 لیستی هەموو کاڵاکانی کۆگا</h3>
+            <input type="text" id="searchInventoryInput" class="search-box" placeholder="🔍 گەڕان بەدوای کاڵا یان کۆد..." oninput="renderInventoryTable()">
+            
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">ناوی کاڵا</th>
+                            <th style="width: 20%;">کۆد</th>
+                            <th style="width: 15%;">فرۆشتن</th>
+                            <th style="width: 15%;">کڕین</th>
+                            <th style="width: 12%;">مەوجوود</th>
+                            <th style="width: 13%;">⚙️</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-expenses" class="tab-content admin-only">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <div class="debt-form" style="border-color:var(--danger); border-top:3px solid var(--danger);">
+            <h3 style="margin-top:0; text-align:center; color:var(--danger);">💸 تۆمارکردنی خەرجی ڕۆژانە</h3>
+            
+            <div class="debt-input-group">
+                <label>جۆری خەرجی:</label>
+                <input type="text" id="expName" placeholder="نموونە: کرێی دوکان، پارەی کارەبا...">
+            </div>
+            <div class="debt-input-group">
+                <label>بڕی پارە (دینار):</label>
+                <input type="text" id="expAmount" class="format-num" inputmode="decimal" placeholder="نموونە: 15,000" style="border-color:var(--danger);">
+            </div>
+            <button class="btn btn-clear" onclick="saveExpense()">➕ زیادکردنی خەرجی</button>
+        </div>
+
+        <div class="history-section">
+            <h3 style="color:var(--danger);">خشتەی خەرجییەکانی ئەم مانگە</h3>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">جۆری خەرجی</th>
+                            <th style="width: 30%;">بەروار</th>
+                            <th style="width: 20%;">بڕ</th>
+                            <th style="width: 15%;">🗑️</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align:left; font-size:18px; font-weight:bold; color:var(--danger); margin-top:10px;">
+                کۆی خەرجی مانگ: <span id="totalMonthlyExpenseLabel">0</span> دینار
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-stats" class="tab-content admin-only">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <h3 style="text-align: center; color: var(--accent); margin-top: 0;">📊 داشبۆردی دارایی</h3>
+        <div class="dashboard-cards" id="generalStatsArea">
+            <div class="dash-card card-today">
+                <h4>🛒 فرۆشی ئەمڕۆ</h4><div class="val" id="cardTodayRev">0</div>
+                <div class="sub-text">قازانج: <span id="cardTodayProf">0</span></div>
+            </div>
+            <div class="dash-card card-revenue">
+                <h4>📅 فرۆشی مانگ</h4><div class="val" id="cardMonthRev">0</div>
+                <div class="sub-text">قازانج: <span id="cardMonthProf">0</span></div>
+            </div>
+            <div class="dash-card card-year">
+                <h4>📆 فرۆشی ساڵ</h4><div class="val" id="cardYearRev">0</div>
+                <div class="sub-text">قازانج: <span id="cardYearProf">0</span></div>
+            </div>
+            <div class="dash-card card-expense">
+                <h4>💸 خەرجی مانگ</h4><div class="val" id="cardMonthExp">0</div>
+                <div class="sub-text">لێدەرکردن لە قازانج</div>
+            </div>
+            <div class="dash-card card-net">
+                <h4>💰 خێری سافی (ئەم مانگە)</h4>
+                <div class="val" id="cardMonthNet" style="font-size: 26px;">0</div>
+                <div id="cardMonthNetWord" style="font-size:13px; margin-top:8px; opacity:0.9; font-weight:normal;">تەنها: سفر دینار</div>
+            </div>
+        </div>
+
+        <div id="negativeProfitWarning"></div>
+
+        <div class="history-section" style="margin-top: 0; margin-bottom: 20px; border-top: 3px solid var(--primary);">
+            <h3 style="color: var(--primary);">📅 گەڕانی گشتی بازاڕ بەپێی کات</h3>
+            <p style="font-size:12px; color:var(--text-color); text-align:center; opacity:0.8; margin-top:-10px;">ئاماری هەموو مارکێتەکە بەیەکەوە ببینە بۆ هەر ڕۆژ یان مانگێک</p>
+            <div class="date-filter-box">
+                <div>
+                    <label>ڕۆژێک دیاریبکە:</label>
+                    <input type="date" id="filterDate" onchange="filterStatsByTime()">
+                </div>
+                <div>
+                    <label>مانگێک دیاریبکە:</label>
+                    <input type="month" id="filterMonth" onchange="filterStatsByTime()">
+                </div>
+                <div>
+                    <label>ساڵ بنووسە:</label>
+                    <input type="number" id="filterYear" placeholder="نموونە: 2026" onchange="filterStatsByTime()">
+                </div>
+            </div>
+            
+            <div id="timeStatResult" style="background: var(--input-bg); padding: 15px; border-radius: 10px; border: 1px dashed var(--border-color); text-align: center;">
+                <span style="color: #999;">تکایە کاتێک هەڵبژێرە لە سەرەوە بۆ بینینی ئامارەکان...</span>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+            <div style="flex:1; min-width:300px; background:var(--input-bg); border-radius:12px; padding:15px; border:1px solid var(--border-color);">
+                <h4 style="margin:0 0 15px 0; color:var(--danger); text-align:center;">⚠️ کاڵا خەوتووەکان (٣٠ ڕۆژی ڕابردوو) <span id="deadStockCount" style="background:var(--danger); color:white; padding:2px 8px; border-radius:10px; font-size:12px;">0</span></h4>
+                <div style="max-height:200px; overflow-y:auto; border:1px solid var(--border-color); border-radius:8px;">
+                    <table class="data-table" style="margin:0;">
+                        <thead><tr><th>ناوی کاڵا</th><th>مەوجوود</th></tr></thead>
+                        <tbody id="deadStockTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="flex:1; min-width:300px; background:var(--input-bg); border-radius:12px; padding:15px; border:1px solid var(--border-color); text-align:center; display:flex; flex-direction:column; justify-content:center;">
+                <h4 style="margin:0 0 15px 0; color:var(--warning);">⏱️ سەعاتە زێڕینەکان (قەرەباڵغترین کات)</h4>
+                <div id="peakHourDisplay" style="font-size:15px; font-weight:bold; color:var(--primary); background:var(--container-bg); padding:15px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); line-height: 1.6;">هێشتا زانیاری نییە بۆ ئەمڕۆ</div>
+            </div>
+        </div>
+
+        <div class="history-section" style="margin-top: 0; border-top: 3px solid var(--success);">
+            <h3 style="color:var(--success);">🔍 گەڕانی تایبەت بۆ یەک کاڵا</h3>
+            <div style="position: relative;">
+                <input type="text" id="statSearchInput" class="search-box" placeholder="ناوي کاڵا بنووسە بۆ بینینی ئامارەکەی..." oninput="showStatAutocomplete()" onblur="setTimeout(()=>document.getElementById('statAutocompleteList').style.display='none', 200)" autocomplete="off">
+                <div id="statAutocompleteList" class="autocomplete-list" style="top: 100%; right: 0; width: 100%; z-index: 1000; display: none;"></div>
+            </div>
+            
+            <div id="itemStatFilterContainer" style="display:none; margin-top:10px; padding:15px; background:var(--input-bg); border-radius:8px; border:1px solid var(--border-color);">
+                <h4 style="margin:0 0 10px 0; text-align:center; color:var(--primary);">📅 فلتەری کات بۆ ئەم کاڵایە</h4>
+                <div class="date-filter-box">
+                    <div><label>ڕۆژ:</label><input type="date" id="itemFilterDate" onchange="calculateItemStats()"></div>
+                    <div><label>مانگ:</label><input type="month" id="itemFilterMonth" onchange="calculateItemStats()"></div>
+                    <div><label>ساڵ:</label><input type="number" id="itemFilterYear" placeholder="نموونە: 2026" onchange="calculateItemStats()"></div>
+                </div>
+            </div>
+
+            <div id="statResultArea" style="margin-top: 10px; text-align: center; padding: 15px; background: var(--input-bg); border-radius: 10px; border: 1px dashed var(--border-color);">
+                <span style="color: #999;">ئەنجامەکانی کاڵاکە لێرە دەردەکەون...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-debts" class="tab-content admin-only">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        
+        <div class="debt-type-toggle" style="background:var(--input-bg); padding:8px; border-radius:12px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
+            <input type="radio" id="modeCustomer" name="debtSystemMode" value="customer" checked onchange="switchDebtMode('customer')">
+            <label for="modeCustomer" class="mode-tab-label">👥 قەرزی کڕیارەکان</label>
+            
+            <input type="radio" id="modeCompany" name="debtSystemMode" value="company" onchange="switchDebtMode('company')">
+            <label for="modeCompany" class="mode-tab-label">🏢 قەرزی خۆم لە کۆمپانیاکان</label>
+        </div>
+
+        <div class="total-section" style="background-image: var(--grad-danger); font-size: 16px;">
+            <span id="debtTotalTitle">کۆی گشتی قەرزی بازاڕ:</span><br>
+            <div style="display:flex; justify-content:space-around; margin-top:10px;">
+                <div><span id="totalMarketDebtIQD" style="font-size: 24px; font-weight:900;">0</span> دینار</div>
+                <div><span id="totalMarketDebtUSD" style="font-size: 24px; font-weight:900;">0</span> دۆلار</div>
+            </div>
+        </div>
+
+        <div class="debt-form">
+            <h3 id="debtFormTitle" style="margin-top:0; text-align:center; color:var(--primary);">تۆمارکردنی مامەڵەی نوێ (کڕیار)</h3>
+            <div class="debt-input-group">
+                <label id="debtorNameLabel">ناوی کڕیار:</label>
+                <input type="text" id="debtorName" placeholder="ناوی سیانی یان نازناو..." oninput="showAutocomplete()" onblur="hideAutocompleteDelayed()" autocomplete="off">
+                <div id="autocompleteList" class="autocomplete-list"></div>
+            </div>
+            <div class="debt-type-toggle" style="background:transparent; padding:0; box-shadow:none;">
+                <input type="radio" id="typeAdd" name="debtType" value="add" checked onchange="toggleDueDateVisibility()">
+                <label id="lblTypeAdd" for="typeAdd" class="debt-action-lbl">قەرزی برد 🔴</label>
+                <input type="radio" id="typePay" name="debtType" value="pay" onchange="toggleDueDateVisibility()">
+                <label id="lblTypePay" for="typePay" class="debt-action-lbl">پارەی هێنایەوە 🟢</label>
+            </div>
+            <div class="currency-selector" style="margin-top: -5px; margin-bottom: 15px;">
+                جۆری دراو: 
+                <label><input type="radio" name="debtCurrency" value="IQD" checked> دینار</label>
+                <label><input type="radio" name="debtCurrency" value="USD"> دۆلار</label>
+            </div>
+            <div class="debt-input-group">
+                <label>بڕی پارە:</label>
+                <input type="text" id="debtAmount" class="format-num" inputmode="decimal" placeholder="نموونە: 25,000">
+            </div>
+            <div class="debt-input-group" id="dueDateContainer">
+                <label>کاتی دانەوەی قەرز (ئارەزوومەندانە):</label>
+                <input type="date" id="debtDueDate" style="background:var(--input-bg); color:var(--text-color); border:1px solid var(--border-color); padding:10px; border-radius:6px; width:100%;">
+            </div>
+            <div class="debt-input-group">
+                <label>تێبینی / کاڵاکان:</label>
+                <input type="text" id="debtNote" placeholder="چی بردووە؟...">
+            </div>
+            <button class="btn btn-save" onclick="saveDebtTransaction()">تۆمارکردن</button>
+        </div>
+
+        <div class="history-section">
+            <input type="text" id="searchDebtor" class="search-box" placeholder="🔍 گەڕان بەدوای ناو..." oninput="renderDebtorsList()">
+            <h3 id="debtListTitle">لیستی قەرزەکان</h3>
+            <div id="debtorsList"></div>
+        </div>
+    </div>
+    <div id="tab-backup" class="tab-content admin-only">
+        <button class="back-home-btn" onclick="goHome()">🏠 گەڕانەوە بۆ سەرەتا</button>
+        <div class="backup-card" style="border-color: var(--primary);">
+            <div class="backup-icon">🔑</div>
+            <h3 style="margin-top: 0; color: var(--primary);">گۆڕینی پاسۆردی سیستەم</h3>
+            <p style="font-size: 13px; color: var(--text-color); opacity:0.8;">پاسۆردی بنەڕەتی <b>0000</b>ـە.</p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <input type="password" id="oldPin" placeholder="پاسۆردی کۆن" style="border:1px solid var(--border-color);">
+                <input type="password" id="newPin" placeholder="پاسۆردی نوێ" style="border:1px solid var(--border-color);">
+                <button class="btn btn-primary" style="background-image:var(--grad-primary);" onclick="changeSystemPin()">گۆڕینی پاسۆرد</button>
+            </div>
+        </div>
+        <div class="backup-card">
+            <div class="backup-icon">📥</div>
+            <h3 style="margin-top: 0;">دابەزاندنی داتاکان (Backup)</h3>
+            <p style="font-size: 13px; color: var(--text-color); opacity:0.8;">هەموو قەرز، وەسڵ، خەرجی و مەخزەن وەک فایلێک دادەبەزێت.</p>
+            <button class="btn btn-add" style="width: 100%;" onclick="exportData()">⬇️ دابەزاندنی فایل</button>
+        </div>
+        <div class="backup-card" style="border-color: var(--danger);">
+            <div class="backup-icon">📤</div>
+            <h3 style="margin-top: 0; color: var(--danger);">هێنانەوەی داتا (Restore)</h3>
+            <p style="font-size: 13px; color: var(--danger); font-weight:bold;">ئاگاداربە: داتای ئێستات دەسڕێتەوە و هی ناو فایلەکە دادەنێت!</p>
+            <div class="file-upload-wrapper">
+                <button class="btn-upload" style="background-image:var(--grad-danger);">📁 هەڵبژاردنی فایلی داتا...</button>
+                <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+            </div>
+        </div>
+    </div>
+    <div class="designer-name">دیزاین و دروستکردنی: شیروان شێرزاد</div>
+</div>
+
+<div class="modal" id="receiptModal">
+    <div class="modal-content">
+        <div id="modalBody"></div>
+        <div class="modal-btns" id="modalBtns">
+            <button class="btn btn-print" onclick="window.print();">🖨️ پرێنتکردن</button>
+            <button class="btn btn-download" onclick="downloadReceiptImage()">📥 مۆبایل</button>
+            <button class="btn btn-close" onclick="closeModal()">داخستن</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="pinModal">
+    <div class="modal-content" style="max-width:300px; text-align:center;">
+        <h3 style="color:var(--primary); margin-top:0;">چوونەژوورەوەی خاوەن کار</h3>
+        <p style="font-size:12px; color:var(--text-color); opacity:0.8;">پاسۆرد لێبدە بۆ بینینی ئامار و مەخزەن</p>
+        <input type="password" id="adminPinInput" pattern="[0-9]*" inputmode="numeric" placeholder="****" style="font-size:24px; letter-spacing:5px; text-align:center; margin-bottom:15px; border:2px solid var(--accent);">
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-save" onclick="verifyPin()">کرانەوە 🔓</button>
+            <button class="btn btn-clear" onclick="closePinModal()">داخستن</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="scannerModal">
+    <div class="modal-content" style="max-width: 400px; padding: 20px;">
+        <h3 style="text-align:center; margin-top:0;">سکانەری کامێرا</h3>
+        <p style="font-size: 12px; text-align:center; margin-bottom:15px;">کامێراکە بگرە سەر بارکۆدی کاڵاکە بۆ خوێندنەوەی</p>
+        <div id="reader"></div>
+        <button class="btn btn-close" style="width:100%; margin-top:15px;" onclick="closeScanner()">داخستنی کامێرا</button>
+    </div>
+</div>
+
+<div class="modal" id="extendDateModal">
+    <div class="modal-content" style="max-width:320px; text-align:center;">
+        <h3 style="color:var(--warning); margin-top:0;">📅 درێژکردنەوەی کاتی قەرز</h3>
+        <p id="extendDateText" style="font-size:14px; color:var(--text-color); font-weight:bold; margin-bottom:15px;"></p>
+        <label style="display:block; text-align:right; font-size:12px; margin-bottom:5px; color:var(--text-color);">کاتی نوێ دیاری بکە:</label>
+        <input type="date" id="newExtendedDate" style="width:100%; margin-bottom:20px; padding:10px; border-radius:6px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-color);">
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-save" style="flex:2;" onclick="confirmExtendDate()">نوێکردنەوە</button>
+            <button class="btn btn-clear" style="flex:1;" onclick="closeExtendDateModal()">نەخێر</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="lowStockModal">
+    <div class="modal-content" style="max-width: 400px; padding: 20px;">
+        <h3 style="text-align:center; margin-top:0; color:var(--danger);">⚠️ ئاگادارکردنەوەی کەمی مەخزەن</h3>
+        <p style="font-size: 13px; text-align:center; margin-bottom:15px; color:var(--text-color);">ئەم کاڵایانە خەریکە تەواو دەبن (٥ دانە یان کەمتر ماون)</p>
+        <div style="max-height:300px; overflow-y:auto; border:1px solid var(--border-color); border-radius:8px; padding:5px; background:var(--input-bg);">
+            <table class="data-table" style="margin:0;">
+                <thead><tr><th>ناوی کاڵا</th><th>بڕی ماوە</th></tr></thead>
+                <tbody id="lowStockTableBody"></tbody>
+            </table>
+        </div>
+        <button class="btn btn-close" style="width:100%; margin-top:15px;" onclick="closeLowStockModal()">داخستن</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
