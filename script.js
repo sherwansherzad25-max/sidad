@@ -2228,3 +2228,77 @@ function toggleReturnMode() {
     }
     applySession();
 })();
+/* ================================================================
+   سیستەمی کڵاود و فایەربەیس (Real-Time Cloud Sync)
+   ================================================================ */
+
+// ١. کۆدەکانی بەستنەوەی داتابەیسەکەی سیداد
+const firebaseConfig = {
+  apiKey: "AIzaSyA51P0dULPWR5J6792r-Zjz0csACfMdDo0",
+  authDomain: "sidad-markit.firebaseapp.com",
+  projectId: "sidad-markit",
+  storageBucket: "sidad-markit.firebasestorage.app",
+  messagingSenderId: "728462769174",
+  appId: "1:728462769174:web:95909d17ad556a19628937",
+  measurementId: "G-SZ1CFBEC1E"
+};
+
+// ٢. چالاککردنی فایەربەیس
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
+// ٣. چالاککردنی دۆخی ئۆفلاین (بۆ کاتی بڕانی ئینتەرنێت)
+db.enablePersistence().catch(function(err) {
+    console.log("Offline mode error:", err);
+});
+
+// ٤. لیستی ئەو داتایانەی کە دەبێت بڕۆنە سەر کڵاود
+const syncKeys = [
+    'khalkhalanInventory', 'khalkhalanSalesData', 'khalkhalanExpenses',
+    'khalkhalanDebts', 'khalkhalanCompanyDebts', 'khalkhalanUsers', 
+    'khalkhalanShifts', 'khalkhalanFull'
+];
+
+// ٥. ناردنی ئۆتۆماتیکی داتا بۆ فایەربەیس (بەبێ تێکدانی خێرایی سیستەمەکە)
+const originalSetItem = localStorage.setItem.bind(localStorage);
+localStorage.setItem = function(key, value) {
+    // خەزنکردن لەناو مۆبایل/کۆمپیوتەرەکە
+    originalSetItem(key, value);
+
+    // ناردن بۆ ئینتەرنێت (فایەربەیس)
+    if (syncKeys.includes(key)) {
+        try {
+            const parsedData = JSON.parse(value);
+            db.collection("SidadMarketDB").doc(key).set({ data: parsedData })
+              .catch(err => console.log("Firebase Save Error:", err));
+        } catch(e) {}
+    }
+};
+
+// ٦. وەرگرتنەوەی ڕاستەوخۆی داتا بۆ ئامێرەکانی تر (Live Sync)
+syncKeys.forEach(key => {
+    db.collection("SidadMarketDB").doc(key).onSnapshot((doc) => {
+        if (doc.exists) {
+            const serverData = doc.data().data;
+            const localData = localStorage.getItem(key);
+            
+            // ئەگەر داتای ئینتەرنێتەکە نوێتر بوو، ئەوا ئامێرەکەش نوێ بکەرەوە
+            if (JSON.stringify(serverData) !== localData) {
+                originalSetItem(key, JSON.stringify(serverData));
+                refreshUI(); // ڕیفرێشکردنی شاشەکان
+            }
+        }
+    });
+});
+
+// ٧. فەنکشنی ڕیفرێشکردنی شاشەکان لە کاتی گۆڕانکاری
+function refreshUI() {
+    if(typeof renderInventoryTable === 'function') renderInventoryTable();
+    if(typeof calculateGeneralStats === 'function') calculateGeneralStats();
+    if(typeof renderExpensesTable === 'function') renderExpensesTable();
+    if(typeof renderDebtorsList === 'function') renderDebtorsList();
+    if(typeof CSH !== 'undefined' && CSH.render) CSH.render();
+    if(typeof checkLowStock === 'function') checkLowStock();
+}
