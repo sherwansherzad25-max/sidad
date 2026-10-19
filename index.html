@@ -31,7 +31,7 @@
             <h1>جیهانی جگه‌ره‌ و ڤه‌یپی سیداد</h1>
             <p class="owner-name">خاوەنی:سیداد</p>
             <div class="live-clock-bar">
-                <span id="liveClockDisplay" id="headerClock">--:--:--</span>
+                <span id="liveClockDisplay">--:--:--</span>
                 <span id="todaySalesBadge" style="background:var(--success); color:white; padding:4px 10px; border-radius:15px; font-size:11px;">🛒 <span id="todaySalesCount">0</span> وەسڵی ئەمڕۆ</span>
             </div>
         </div>
@@ -182,7 +182,7 @@
         </div>
 
         <div class="history-section">
-            <h3 style="color: var(--primary); text-align: center; margin: 0 0 15px 0;">🧾 وەسڵەکانی ئەمڕۆ (٦ بەیانی تا ئێستا)</h3>
+            <h3 style="color: var(--primary); text-align: center; margin: 0 0 15px 0;">🧾 وەسڵەکانی ئەمڕۆ</h3>
             <div style="display: flex; gap: 10px; align-items: flex-start;">
                 <div style="flex: 1; border: 1px solid var(--success); border-radius: 8px; background: var(--container-bg); overflow: hidden;">
                     <div style="background: rgba(40, 167, 69, 0.1); padding: 8px; text-align: center; font-weight: bold; color: var(--success); border-bottom: 1px solid var(--success);">🛒 فرۆشتن</div>
@@ -362,8 +362,8 @@
                 </div>
             </div>
             <div class="debt-input-group">
-                <label>ناوی کاڵا (نموونە: ئیسی شین):</label>
-                <input type="text" id="invName" placeholder="نموونە: ئیسی ره‌ش">
+                <label>ناوی کاڵا (نموونە: میلانۆ شین):</label>
+                <input type="text" id="invName" placeholder="نموونە: چای مەحمود ٥٠٠گم یان میلانۆ شین">
             </div>
             <div class="top-btns">
                 <div class="debt-input-group" style="flex:1;">
@@ -539,10 +539,35 @@
             </div>
         </div>
 
+        <div class="history-section" style="margin-top: 0; margin-bottom: 20px; border-top: 3px solid var(--accent);">
+            <h3 style="color: var(--accent);">📦 دۆخی هەموو مەخزەن</h3>
+            <p style="font-size:12px; color:var(--text-color); text-align:center; opacity:0.8; margin-top:-10px;">کەمترین بڕەکان لە سەرەوەن، بۆ ئەوەی پێش تەواو بوونیان بیانهێنیت</p>
+            <div id="stockSummary" style="text-align:center; font-size:13px; margin-bottom:12px; line-height:1.8;"></div>
+            <div class="input-with-btn" style="margin-bottom:12px;">
+                <input type="text" id="stockOverviewSearch" class="search-box" style="margin-bottom:0;" placeholder="🔍 ناو یان کۆدی کاڵا بنووسە، یان سکان بکە..." oninput="renderStockOverview()" autocomplete="off">
+                <button class="btn-camera" onclick="openScanner(this, 'stockOverviewSearch')">📷</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:12px; background:var(--input-bg); padding:10px; border-radius:10px; border:1px dashed var(--accent);">
+                <span style="font-size:13px; font-weight:bold;">پیشانی بدە ئەوانەی</span>
+                <input type="number" id="stockMaxQty" min="0" inputmode="numeric" placeholder="نموونە: 20" oninput="renderStockOverview()" style="width:110px; padding:8px; font-weight:bold;">
+                <span style="font-size:13px; font-weight:bold;">عەدەد یان کەمتر ماون</span>
+                <button class="btn btn-clear" style="flex:none; padding:8px 14px; font-size:12px;" onclick="document.getElementById('stockMaxQty').value=''; renderStockOverview();">هەموو</button>
+            </div>
+            <div class="table-responsive" style="max-height:420px; overflow-y:auto;">
+                <table class="data-table">
+                    <thead><tr><th style="width:40%;">ناوی کاڵا</th><th style="width:25%;">کۆد</th><th style="width:15%;">ماوە</th><th style="width:20%;">دۆخ</th></tr></thead>
+                    <tbody id="stockOverviewBody"></tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="history-section" style="margin-top: 0; border-top: 3px solid var(--success);">
             <h3 style="color:var(--success);">🔍 گەڕانی تایبەت بۆ یەک کاڵا</h3>
             <div style="position: relative;">
-                <input type="text" id="statSearchInput" class="search-box" placeholder="ناوي کاڵا بنووسە بۆ بینینی ئامارەکەی..." oninput="showStatAutocomplete()" onblur="setTimeout(()=>document.getElementById('statAutocompleteList').style.display='none', 200)" autocomplete="off">
+                <div class="input-with-btn" style="margin-bottom:15px;">
+                    <input type="text" id="statSearchInput" class="search-box" style="margin-bottom:0;" placeholder="ناو یان کۆدی کاڵا بنووسە، یان سکان بکە..." oninput="showStatAutocomplete()" onkeydown="if(event.key==='Enter'){ statSearchEnter(); }" onblur="setTimeout(()=>document.getElementById('statAutocompleteList').style.display='none', 200)" autocomplete="off">
+                    <button class="btn-camera" onclick="openScanner(this, 'statSearchInput')">📷</button>
+                </div>
                 <div id="statAutocompleteList" class="autocomplete-list" style="top: 100%; right: 0; width: 100%; z-index: 1000; display: none;"></div>
             </div>
             
@@ -624,7 +649,7 @@
         <div class="backup-card" style="border-color: var(--primary);">
             <div class="backup-icon">🔑</div>
             <h3 style="margin-top: 0; color: var(--primary);">گۆڕینی پاسۆردی سیستەم (کڵاود)</h3>
-            <p style="font-size: 13px; color: var(--text-color); opacity:0.8;">پاسۆردی بنەڕەتی <b>0000</b>ـە. لێرەوە پاسۆردی خۆت و کاشێرەکە بگۆڕە و ڕاستەوخۆ لە هەموو ئامێرەکان دەگۆڕێت.</p>
+            <p style="font-size: 13px; color: var(--text-color); opacity:0.8;">پاسۆردی بنەڕەتی <b>0000</b>ـە. لێرەوە پاسۆردی خۆت بگۆڕە و ڕاستەوخۆ لە هەموو ئامێرەکان دەگۆڕێت.</p>
             
             <div style="display:flex; flex-direction:column; gap:15px; margin-top: 15px;">
                 <div style="text-align: right;">
@@ -632,13 +657,15 @@
                     <input type="text" id="newAdminPinSettings" placeholder="بۆ نموونە: 1234" style="width:100%; border:1px solid var(--border-color); padding:8px; border-radius:5px; margin-top:5px; text-align:left;" dir="ltr">
                 </div>
 
-                <div style="text-align: right;">
-                    <label style="font-weight: bold; font-size: 13px;">پاسۆردی نوێی کاشێر:</label>
-                    <input type="text" id="newCashierPinSettings" placeholder="بۆ نموونە: 0000" style="width:100%; border:1px solid var(--border-color); padding:8px; border-radius:5px; margin-top:5px; text-align:left;" dir="ltr">
-                </div>
 
                 <button class="btn btn-primary" style="background-image:var(--grad-primary);" onclick="changeSystemPasswords()">پاشەکەوتکردنی پاسۆردەکان لە کڵاود</button>
             </div>
+        </div>
+        <div class="backup-card">
+            <div class="backup-icon">🖨️</div>
+            <h3 style="margin-top: 0;">پرێنتی خۆکار</h3>
+            <p style="font-size: 13px; color: var(--text-color); opacity:0.8;">کاتێک وەسڵ دەبڕیت، خۆکارانە پرێنت بکرێت؟ (تەنها بۆ ئەم ئامێرە)</p>
+            <button id="autoPrintToggleBtn" class="btn btn-add" style="width: 100%;" onclick="toggleAutoPrint()">🖨️ پرێنتی خۆکار: چالاک</button>
         </div>
         <div class="backup-card">
             <div class="backup-icon">📥</div>
@@ -707,7 +734,7 @@
 <div class="modal" id="lowStockModal">
     <div class="modal-content" style="max-width: 400px; padding: 20px;">
         <h3 style="text-align:center; margin-top:0; color:var(--danger);">⚠️ ئاگادارکردنەوەی کەمی مەخزەن</h3>
-        <p style="font-size: 13px; text-align:center; margin-bottom:15px; color:var(--text-color);">ئەم کاڵایانە خەریکە تەواو دەبن (٥ دانە یان کەمتر ماون)</p>
+        <p style="font-size: 13px; text-align:center; margin-bottom:15px; color:var(--text-color);">ئەم کاڵایانە خەریکە تەواو دەبن (١٠ دانە یان کەمتر ماون)</p>
         <div style="max-height:300px; overflow-y:auto; border:1px solid var(--border-color); border-radius:8px; padding:5px; background:var(--input-bg);">
             <table class="data-table" style="margin:0;">
                 <thead><tr><th>ناوی کاڵا</th><th>بڕی ماوە</th></tr></thead>
